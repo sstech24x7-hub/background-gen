@@ -1,4 +1,4 @@
-name: Render Video
+name: Fast Render Video
 on: 
   push:
     branches: [ main ]
@@ -18,15 +18,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm' # Isse install fast hoga
+          cache-dependency-path: ./template-helloworld-main/package-lock.json
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci # 'install' se fast hota hai
 
       - name: Render Video
-        run: npx remotion render src/index.ts HelloWorld out.mp4 --codec=h264 --fps=60
+        # Adobe Stock ke liye 30fps best balance hai
+        run: npx remotion render src/index.ts HelloWorld out.mp4 --fps=30 --concurrency=16 --quiet
 
       - name: Save Video Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: final-video
+          name: adobe-stock-video
           path: template-helloworld-main/out.mp4
+          retention-days: 1
